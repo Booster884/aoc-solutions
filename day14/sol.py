@@ -9,21 +9,21 @@ def sign(a):
         return 1
     return 0
 
-w = 600
+w = 1000
 h = 200
 grid = []
 for _ in range(h):
     grid.append([' '] * w)
 
+maxy = 0
 s = 0
-l = []
 
 # Create walls
 for line in file.read().split('\n')[:-1]:
     line = line.split(" -> ")
     line = [coord.split(',') for coord in line]
     line = [(int(c[0]), int(c[1])) for c in line]
-    
+
     pos = line[0]
     grid[pos[1]][pos[0]] = '#'
     for i in range(len(line) - 1):
@@ -31,23 +31,26 @@ for line in file.read().split('\n')[:-1]:
         while pos != line[i+1]:
             pos = (pos[0] + d[0], pos[1] + d[1])
             grid[pos[1]][pos[0]] = '#'
+        maxy = max(maxy, pos[1])
 
-    pass
+maxy += 2
+print(maxy)
 
 # Simulate sand
 def hah():
     s = 0
     for _ in range(1000000):
         pos = (500, 0)
+        if grid[0][500] == 'o':
+            return s
         resting = False
-        print(_)
         while not resting:
             resting = True
             for d in dirs:
                 dpos = (pos[0] + d[0], pos[1] + d[1])
                 if not (0 < dpos[0] < w and 0 < dpos[1] < h):
                     return s
-                if grid[dpos[1]][dpos[0]] == ' ':
+                if grid[dpos[1]][dpos[0]] == ' ' and dpos[1] < maxy:
                     pos = dpos
                     resting = False
                     break
@@ -56,8 +59,4 @@ def hah():
                 s += 1
                 break
 
-for y in range(0, 10):
-    print(grid[y][494:504])
-
-print("1:", hah())
-print("2:")
+print("2:", hah())
