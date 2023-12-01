@@ -1,7 +1,6 @@
+import random
 import re
 file = open("in", "r")
-
-dirs = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
 lines = file.read().split('\n')[:-1]
 
@@ -38,15 +37,14 @@ def rec_desc(curr, paths_left, time_left):
 
     if paths_left == None or len(paths_left) == 0:
         press = vertices[curr][0]
-        # print(press, time_left)
         return press * time_left
 
     a = []
     for n in paths_left:
         next_paths = paths_left.copy()
         next_paths.remove(n)
-        # print(n, next_paths)
-        a.append(rec_desc(n, next_paths, time_left - 1 - edges[curr][n]))
+        next_time = time_left - 1 - edges[curr][n]
+        a.append(rec_desc(n, next_paths, next_time))
 
     press = vertices[curr][0]
     return press * time_left + max(a)
@@ -58,7 +56,6 @@ for line in lines:
     flowrate = int(flowrate[0])
     active = flowrate == 0
     vertices[tunnels[0]] = (flowrate, tunnels[1:], active)
-# print(vertices)
 
 curr = "AA"
 edges[curr] = bfs(curr)
@@ -70,5 +67,25 @@ for key in vertices:
     edges[key] = bfs(key)
     poss.append(key)
 
-print("1:", rec_desc(curr, poss, 30))
-print("2:", 2)
+ugh = set()
+vals = []
+for _ in range(len(poss) * 2):
+    # poss = poss[1:] + [poss[0]]
+    random.shuffle(poss)
+    if ''.join(poss) in ugh:
+        continue
+    ugh.add(''.join(poss))
+
+    for i in range(1, len(poss) // 2 + 1):
+        a = poss[i:]
+        b = poss[:i]
+        ugh.add((''.join(a), ''.join(b)))
+        vals.append(rec_desc(curr, a, 26) + rec_desc(curr, b, 26))
+        print(a, b, max(vals))
+
+# print("1:", rec_desc(curr, poss, 30))
+# print("2:", max(vals))
+# low: 2284
+# low: 2606
+# low: 2711
+# low: 2760
