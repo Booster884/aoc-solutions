@@ -2,18 +2,22 @@ with open('input') as f:
     maps = f.read().split('\n\n')
 
 seeds = [int(x) for x in maps[0].split(': ')[1].split()]
+seeds = list(zip(seeds[0::2], seeds[1::2]))
 
-for mapping in maps:
-    ranges = mapping.splitlines()[1:]
-    mapped = [False] * len(seeds)
-    for range_ in ranges:
-        dest_start, src_start, length = [int(x) for x in range_.split()]
-        dest = range(dest_start, dest_start + length)
-        src = range(src_start, src_start + length)
+mappings = []
+for map_str in maps[1:]:
+    ranges = map_str.splitlines()[1:]
+    mappings.append([[int(x) for x in r.split()] for r in ranges])
 
-        for i, seed in enumerate(seeds):
-            if seed in src and not mapped[i]:
-                seeds[i] = dest[src.index(seed)]
-                mapped[i] = True
+for i in range(10000000000000):
+    x = i
+    for mapping in mappings[::-1]:
+        for dest, src, length in mapping:
+            if x >= dest and x < dest + length:
+                x += src - dest
+                break
 
-print('1:', min(seeds))
+    for start, length in seeds:
+        if x >= start and x < start + length:
+            print(i)
+            exit()
