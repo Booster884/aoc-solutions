@@ -1,5 +1,4 @@
-from functools import reduce
-from operator import mul
+import math
 
 with open('input') as f:
     times, distances = f.readlines()
@@ -7,19 +6,12 @@ with open('input') as f:
     distances = [int(d) for d in distances.split(':')[1].split()]
     races = zip(times, distances)
 
-ans1 = []
-for time, distance in races:
-    c = [t * (time - t) for t in range(time)]
-    winning = [d for d in c if d > distance]
-    ans1.append(len(winning))
+def win_count(time, distance):
+    return sum([t * (time - t) > distance for t in range(time)])
 
-print('1:', reduce(mul, ans1, 1))
+print('1:', math.prod(win_count(*race) for race in races))
 
 time = int(''.join(str(t) for t in times))
 distance = int(''.join(str(d) for d in distances))
 
-c = [t * (time - t) for t in range(time)]
-winning = [d for d in c if d > distance]
-ans2 = len(winning)
-
-print('2:', ans2)
+print('2:', win_count(time, distance))
