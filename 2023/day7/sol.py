@@ -1,10 +1,13 @@
 from functools import cmp_to_key
 
 
-values = 'AKQJT98765432'
+values = 'AKQT98765432J'
+values_ = 'AKQT98765432'
 
 def get_type(hand):
-    counts = sorted([hand.count(v) for v in values], reverse=True)
+    counts = sorted([hand.count(v) for v in values_], reverse=True)
+    jokers = hand.count('J')
+    counts[0] += jokers
     if counts[0] == 5:
         # Five of a kind
         return 0
@@ -45,11 +48,8 @@ def cmp(a, b):
             elif values.index(a) > values.index(b):
                 return 1
 
-with open('in') as f:
-    lines = f.readlines()
-
-rounds = [line.split() for line in lines]
+with open('test') as f:
+    rounds = [line.split() for line in f.readlines()]
 
 by_hand_value = sorted(rounds, key=cmp_to_key(cmp), reverse=True)
 print(sum(int(x[1]) * (i + 1) for i, x in enumerate(by_hand_value)))
-
