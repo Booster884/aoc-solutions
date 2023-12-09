@@ -3,19 +3,20 @@ from itertools import pairwise
 with open('in') as f:
     sequences = [list(map(int, line.split())) for line in f.readlines()]
 
-ans1 = []
+ans1 = 0
+ans2 = 0
 
 for seq in sequences:
     ll = [seq]
-    while not all(i == 0 for i in ll[-1]) and len(ll[-1]) > 0:
+    while not all([x == 0 for x in ll[-1]]):
         ll.append(list(map(lambda t: t[1] - t[0], pairwise(ll[-1]))))
-    ll = list(reversed([list(reversed(l)) for l in ll]))
 
-    for i, l in enumerate(ll):
-        if i == 0:
-            ll[i].append(0)
-        else:
-            ll[i].append(l[-1] - ll[i - 1][-1])
-    ans1.append(ll[-1][-1])
+    for prev, curr in pairwise(ll[::-1]):
+        curr[:0] = [curr[0] - prev[0]]
+        curr += [curr[-1] + prev[-1]]
 
-print('2:', sum(ans1))
+    ans1 += ll[0][-1]
+    ans2 += ll[0][0]
+
+print('1:', ans1)
+print('2:', ans2)
