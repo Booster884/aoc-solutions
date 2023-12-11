@@ -4,24 +4,38 @@ from itertools import combinations
 with open('in') as f:
     rows = f.read().splitlines()
 
-def expand(rows):
-    empty = []
-    for i, row in enumerate(rows):
-        if all(c == '.' for c in row):
-            empty.append(i)
-    for i in empty[::-1]:
-        rows.insert(i, '.' * len(rows[0]))
-
-expand(rows)
-transposed_rows = [list(col) for col in zip(*rows)]
-expand(transposed_rows)
+GROWTH_FACTOR = 1000000 - 1
 
 points = set()
 
-for x, column in enumerate(transposed_rows):
-    for y, cell in enumerate(column):
+for y, row in enumerate(rows):
+    for x, cell in enumerate(row):
         if cell == '#':
             points.add((x, y))
+
+for i in range(len(rows[0]) -1, -1, -1):
+    in_column = [(x, y) for x, y in points if x == i]
+    if len(in_column) > 0:
+        continue
+    to_move = []
+    for x, y in points:
+        if x > i:
+            to_move.append((x, y))
+    for x, y in to_move:
+        points.remove((x, y))
+        points.add((x + GROWTH_FACTOR, y))
+
+for i in range(len(rows[0]) -1, -1, -1):
+    in_row = [(x, y) for x, y in points if y == i]
+    if len(in_row) > 0:
+        continue
+    to_move = []
+    for x, y in points:
+        if y > i:
+            to_move.append((x, y))
+    for x, y in to_move:
+        points.remove((x, y))
+        points.add((x,  y + GROWTH_FACTOR))
 
 total_distance = 0
 
