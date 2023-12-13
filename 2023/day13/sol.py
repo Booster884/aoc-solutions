@@ -1,24 +1,33 @@
 with open('in') as f:
     grids = f.read().split('\n\n')
 
-ans1 = 0
+def distance(a, b):
+    dist = 0
+    for i in range(min(len(a), len(b))):
+        dist += a[i] != b[i]
+    return dist
 
-def mirror_point(grid) -> int:
+def mirror_point(grid, smudge):
     for i in range(len(grid[0]) - 1):
-        same = []
+        dists = []
         for row in grid:
-            left, right = row[i+1::-1], row[i:]
-            size = min(len(left), len(right))
-            left, right = left[:size], right[:size]
-            same.append(left == right)
-        if all(same):
+            left, right = row[i::-1], row[i+1:]
+            dists.append(distance(left, right))
+        if sum(dists) == int(smudge):
             return i + 1
     return 0
 
+ans1 = 0
+ans2 = 0
+
 for grid in grids:
     grid = grid.splitlines()
-    ans1 += mirror_point(grid)
+    ans1 += mirror_point(grid, False)
+    ans2 += mirror_point(grid, True)
+
     grid = list(zip(*grid))
-    ans1 += mirror_point(grid) * 100
+    ans1 += mirror_point(grid, False) * 100
+    ans2 += mirror_point(grid, True) * 100
 
 print('1:', ans1)
+print('2:', ans2)
