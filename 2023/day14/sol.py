@@ -1,6 +1,21 @@
 with open('in') as f:
     rows = f.read().split('\n')
 
+def grid_string(round_rocks):
+    string = ''
+    for y in range(h):
+        for x in range(w):
+            if (x, y) in round_rocks:
+                string += 'O'
+            elif (x, y) in square_rocks:
+                string += '#'
+            else:
+                string += '.'
+        # Not strictly ncessary
+    return string
+
+dirs = [(0, -1), (-1, 0), (0, 1), (1, 0)]
+
 w = len(rows[0])
 h = len(rows)
 
@@ -14,18 +29,34 @@ for i, row in enumerate(rows):
         elif cell == '#':
             square_rocks.add((j, i))
 
-for _ in range(100000):
-    any_moved = False
-    rocks_temp = list(round_rocks)
-    for x, y in rocks_temp:
-        if (x, y - 1) not in square_rocks.union(round_rocks) and y > 0:
-            any_moved = True
-            round_rocks.remove((x, y))
-            round_rocks.add((x, y - 1))
-    if not any_moved:
-        break
+seen = {}
 
-ans1 = 0
+i = 0
+END = 1000000000 * 4
+while i < END:
+    if grid_string(round_rocks) in seen and i < 10000:
+        cycle_length = i - seen[grid_string(round_rocks)]
+        i_left = (END - i) % cycle_length
+        i = END - i_left
+    rocks_prev = round_rocks.copy()
+    round_rocks = set()
+    dx, dy = dirs[i % 4]
+    for sx, sy in rocks_prev:
+        # New position will be that of the first immovable object (wall/rock)
+        # minus the number of movable object (round rocks)
+        x, y = sx, sy
+        num_round = 0
+        while x in range(w) and y in range(h - 1) and (x, y) not in square_rocks:
+            x, y = x + dx, y + dy
+            if (x, y) in rocks_prev:
+                num_round += 1
+
+        nx, ny = x - dx * (num_round + 1), y - dy * (num_round + 1)
+        round_rocks.add((nx, ny))
+    seen[grid_string(rocks_prev)] = i
+    i += 1
+
+ans = 0
 for _, y in round_rocks:
-    ans1 += h - y - 1
-print(ans1)
+    ans += h - y - 1
+print(ans)
