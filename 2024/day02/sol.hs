@@ -13,11 +13,20 @@ safe xs = all (head signs ==) (tail signs) && all ((`elem` [1..3]) . abs) diffs
 solve1 :: [[Int]] -> Int
 solve1 = length . filter safe
 
-solve2 = undefined
+dampened :: [a] -> [[a]]
+dampened xs = [take i xs ++ drop (i + 1) xs | i <- [0..length xs - 1]]
+    where l = length xs
+
+anySafe :: [Int] -> Bool
+anySafe xs | safe xs = True
+           | otherwise = any safe $ dampened xs
+
+solve2 :: [[Int]] -> Int
+solve2 = length . filter anySafe
 
 main :: IO ()
 main =
     do inLines <- lines <$> readFile "input"
        let reports = map (map read . words) inLines
        print $ solve1 reports
-       -- print $ solve2 reports
+       print $ solve2 reports
