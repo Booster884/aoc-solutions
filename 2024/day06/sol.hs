@@ -36,12 +36,11 @@ move (obs, (w, h), (x, y), (dx, dy), been, dirBeen)
     | otherwise = move (obs, (w, h), (nx, ny), (dx, dy), newBeen, newDirBeen)
     where (nx, ny) = (x + dx, y + dy)
           obstructed = Set.member (nx, ny) obs
-          outOfBounds = not (nx `elem` [0..w] && ny `elem` [0..h])
+          outOfBounds = not (nx > 0 && nx < w && ny > 0 && ny < w)
           loop = Set.member ((x, y), (dx, dy)) dirBeen
           newBeen = Set.insert (x, y) been
           newDirBeen = Set.insert ((x, y), (dx, dy)) dirBeen
 
--- Slow as hell
 solve2 :: GridState -> Set Point -> Int
 solve2 (obs, size, pos, dir, _, _) been = length $ filter snd $
     [move (Set.insert x obs, size, pos, dir, Set.empty, Set.empty)
