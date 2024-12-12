@@ -7,15 +7,17 @@ w, h = len(grid[0]), len(grid)
 
 grid_set = set(product(range(w), range(h)))
 
-def flood(grid, x, y):
-    c = grid[y][x]
+grid_map = {(x, y): grid[y][x] for (x,y) in product(range(w), range(h))}
+
+def flood(map, x, y):
+    c = map[(x, y)]
     stack = [(x, y)]
     region = set([(x, y)])
 
     while len(stack) > 0:
         x, y = stack.pop()
         for nx, ny in [(x + dx, y + dy) for dx, dy in neighborhood]:
-            if 0 <= nx < w and 0 <= ny < h and (nx, ny) not in region and grid[ny][nx] == c:
+            if (nx, ny) in map and (nx, ny) not in region and map[(nx, ny)] == c:
                 stack.append((nx, ny))
                 region.add((nx, ny))
 
@@ -32,15 +34,29 @@ def perimeter(region):
                 p += 1
     return p
 
-regions = []
-while len(grid_set) > 0:
-    (x, y) = grid_set.pop()
-    region = flood(grid, x, y)
-    regions.append(region)
-    grid_set -= region
+def edges(region):
+    e = 0
+    for dx, dy in neighborhood:
+        hmm = {(x + dx, y + dy): "?" for (x, y) in region if (x + dx, y + dy) not in region}
+        e += len(split_regions(hmm))
+    return e
 
-part1 = 0
+def split_regions(map):
+    todo = set(map.keys())
+    regions = []
+    while len(todo) > 0:
+        (x, y) = todo.pop()
+        region = flood(map, x, y)
+        regions.append(region)
+        todo -= region
+    return regions
+
+regions = split_regions(grid_map)
+
+part1 = part2 = 0
 for region in regions:
     part1 += area(region) * perimeter(region)
+    part2 += area(region) * edges(region)
 
 print(part1)
+print(part2)
