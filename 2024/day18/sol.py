@@ -65,17 +65,23 @@ def de_astar(movable, start, end):
             a = next(to)
             b = next(fro)
         except StopIteration:
-            return None
+            return set()
         intersection = set(a) & set(b)
         if len(intersection) != 0:
             p = intersection.pop()
-            return len(a[p]) + len(b[p])
+            return set(a[p]) | set(b[p])
 
 
-print(de_astar(movable, (0, 0), (ex, ey)))
+print(len(de_astar(movable, (0, 0), (ex, ey))) + 1)
 
-for n in range(0, len(points)):
-    movable = set(product(range(ex + 1), range(ey + 1))) - set(points[:n])
-    if de_astar(movable, (0, 0), (ex, ey)) is None:
-        print(n - 1, points[n - 1])
+movable = set(product(range(ex + 1), range(ey + 1)))
+path = set()
+
+for point in points:
+    movable.remove(point)
+    if len(path) > 0 and point not in path:
+        continue
+    path = de_astar(movable, (0, 0), (ex, ey))
+    if len(path) == 0:
+        print(point)
         break
