@@ -1,5 +1,3 @@
-from collections import defaultdict, deque
-
 neighborhood = [(0,1), (1, 0), (0, -1), (-1, 0)]
 
 grid = open("input").read().strip()
@@ -19,13 +17,12 @@ for y, row in enumerate(grid):
             end = (x, y)
 
 
-# It really doesn't matter how `todo` is ordered, there is always one tile left.
 def bfs(walls, start, end):
-    todo = deque([(start, 0)])
+    todo = [(start, 0)]
     seen = dict()
 
     while len(todo) > 0:
-        curr, path_len = todo.popleft()
+        curr, path_len = todo.pop()
         x, y = curr
 
         seen[(x, y)] = path_len
@@ -41,21 +38,43 @@ def bfs(walls, start, end):
     return dict()
 
 
-path = bfs(walls, start, end)
-path_len = path[end]
+# Here we intend to check all tiles in range anyway, so ordering of `todo`
+# doesn't matter here either.
+def cheat(path, start, length):
+    x, y = start
+    poss = []
 
-seen = defaultdict(int)
+    for nx in range(x-length, x+length+1):
+        for ny in range(y-length, y+length+1):
+            dist = abs(x - nx) + abs(y - ny)
+            if dist <= length and (nx, ny) in path:
+                poss.append((path[(nx, ny)], dist))
+
+    return poss
+
+
+path = bfs(walls, start, end)
+
 part1 = 0
 
-for x, y in path:
-    for dx, dy in neighborhood:
-        nx, ny = x + dx, y + dy
-        if (nx, ny) in walls and (nx + dx, ny + dy) in path:
-            time_saved = path[(x, y)] - path[(nx + dx, ny + dy)] - 2
-
-            if time_saved > 0:
-                seen[time_saved] += 1
-            if time_saved >= 100:
-                part1 += 1
+for point in path:
+    time = path[point]
+    cheats = cheat(path, point, 2)
+    time_saves = [time - v - l for v, l in cheats if time - v - 2 > 0]
+    for time_save in time_saves:
+        if time_save >= 100:
+            part1 += 1
 
 print(part1)
+
+part2 = 0
+
+for point in path:
+    time = path[point]
+    cheats = cheat(path, point, 20)
+    time_saves = [time - val - l for val, l in cheats]
+    for time_save in time_saves:
+        if time_save >= 100:
+            part2 += 1
+
+print(part2)
