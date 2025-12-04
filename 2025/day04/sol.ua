@@ -12,7 +12,7 @@ Input     ← &fras "input"
 
 Parse ← ⊜(=@@)⊸≠@\n
 
-FindRemovable ← ×⊸(≡(↘¯1↘1)↘¯1↘1 ⬚0⧈(≤4/+♭)3_3)
+FindRemovable ← ×⊸(<4/+⬚0↻⊂C₂A₂)
 
 Part₁ ← /+/+FindRemovable
 Part₂ ← -⊙(/+/+)⊸(/+/+⍥(-⊸FindRemovable)∞)
